@@ -8,6 +8,8 @@ import (
 )
 
 var millenniumImg *ebiten.Image
+var millenniumX float64 = 365
+var millenniumSpeed float64 = 6
 
 func init() {
 	var err error
@@ -23,8 +25,15 @@ func update(screen *ebiten.Image) error {
 	}
 	// ebitenutil.DebugPrint(screen, "Hello, World!")
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(365, 252)
+	op.GeoM.Translate(millenniumX, 252)
 	screen.DrawImage(millenniumImg, op)
+
+	millenniumX = millenniumX + millenniumSpeed
+
+	if millenniumX >= 730 || millenniumX <= 0 {
+		millenniumSpeed = millenniumSpeed * -1
+	}
+
 	return nil
 }
 
