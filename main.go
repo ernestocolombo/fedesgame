@@ -79,7 +79,7 @@ func update(screen *ebiten.Image) error {
 	op.GeoM.Translate(millenniumX, millenniumY)
 	screen.DrawImage(millenniumImg, op)
 
-	// Debug iinfos
+	// Debug infos
 	debugMsg := fmt.Sprintf("Millennium X: %d, Y: %d", int64(millenniumX), int64(millenniumY))
 	ebitenutil.DebugPrint(screen, debugMsg)
 
