@@ -44,6 +44,33 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
+	// Get user input and update game state
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		millenniumX -= millenniumSpeed
+		if millenniumX < 0 {
+			millenniumX = 0
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		millenniumX += millenniumSpeed
+		if millenniumX > screenWidth-millenniumW {
+			millenniumX = screenWidth - millenniumW
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		millenniumY -= millenniumSpeed
+		if millenniumY < 0 {
+			millenniumY = 0
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		millenniumY += millenniumSpeed
+		if millenniumY > screenHeight-millenniumH {
+			millenniumY = screenHeight - millenniumH
+		}
+	}
+
+	// Draw scene
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(screenWidth/float64(bgImg.Bounds().Dx()), screenHeight/float64(bgImg.Bounds().Dy()))
 	screen.DrawImage(bgImg, op)
@@ -52,34 +79,7 @@ func update(screen *ebiten.Image) error {
 	op.GeoM.Translate(millenniumX, millenniumY)
 	screen.DrawImage(millenniumImg, op)
 
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		millenniumX -= millenniumSpeed
-		if millenniumX < 0 {
-			millenniumX = 0
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		millenniumX += millenniumSpeed
-		if millenniumX > screenWidth-millenniumW {
-			millenniumX = screenWidth - millenniumW
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		millenniumY -= millenniumSpeed
-		if millenniumY < 0 {
-			millenniumY = 0
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		millenniumY += millenniumSpeed
-		if millenniumY > screenHeight-millenniumH {
-			millenniumY = screenHeight - millenniumH
-		}
-	}
-
+	// Debug iinfos
 	debugMsg := fmt.Sprintf("Millennium X: %d, Y: %d", int64(millenniumX), int64(millenniumY))
 	ebitenutil.DebugPrint(screen, debugMsg)
 
