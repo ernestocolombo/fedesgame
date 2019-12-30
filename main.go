@@ -1,14 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
+const (
+	screenWidth  = 1000
+	screenHeight = 800
+)
+
 var millenniumImg *ebiten.Image
-var millenniumX float64 = 365
+var millenniumX float64
+var millenniumY float64
+var millenniumW float64
+var millenniumH float64
 var millenniumSpeed float64 = 6
 
 func init() {
@@ -17,28 +26,58 @@ func init() {
 	if err != nil {
 		log.Fatalf("could not load millennium image: %v", err)
 	}
+	millenniumW = float64(millenniumImg.Bounds().Dx())
+	millenniumH = float64(millenniumImg.Bounds().Dy())
+	millenniumX = (screenWidth - millenniumW) / 2
+	millenniumY = (screenHeight - millenniumH) / 2
 }
 
 func update(screen *ebiten.Image) error {
 	if ebiten.IsDrawingSkipped() {
 		return nil
 	}
-	// ebitenutil.DebugPrint(screen, "Hello, World!")
+
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(millenniumX, 252)
+	op.GeoM.Translate(millenniumX, millenniumY)
 	screen.DrawImage(millenniumImg, op)
 
-	millenniumX = millenniumX + millenniumSpeed
-
-	if millenniumX >= 730 || millenniumX <= 0 {
-		millenniumSpeed = millenniumSpeed * -1
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		millenniumX -= millenniumSpeed
+		if millenniumX < 0 {
+			millenniumX = 0
+		}
 	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		millenniumX += millenniumSpeed
+		if millenniumX > screenWidth-millenniumW {
+			millenniumX = screenWidth - millenniumW
+		}
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		millenniumY -= millenniumSpeed
+		if millenniumY < 0 {
+			millenniumY = 0
+		}
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		millenniumY += millenniumSpeed
+		if millenniumY > screenHeight-millenniumH {
+			millenniumY = screenHeight - millenniumH
+		}
+	}
+
+	debugMsg := fmt.Sprintf("Millennium X: %d, Y: %d", int64(millenniumX), int64(millenniumY))
+	ebitenutil.DebugPrint(screen, debugMsg)
 
 	return nil
 }
 
 func main() {
-	if err := ebiten.Run(update, 800, 600, 1, "This my game and it's called Asteroid Field!"); err != nil {
+	title := "This my game and it's called Asteroid Field!"
+	if err := ebiten.Run(update, screenWidth, screenHeight, 1, title); err != nil {
 		log.Fatal(err)
 	}
 }
