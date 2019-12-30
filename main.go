@@ -13,6 +13,8 @@ const (
 	screenHeight = 800
 )
 
+var bgImg *ebiten.Image
+
 var millenniumImg *ebiten.Image
 var millenniumX float64
 var millenniumY float64
@@ -30,6 +32,11 @@ func init() {
 	millenniumH = float64(millenniumImg.Bounds().Dy())
 	millenniumX = (screenWidth - millenniumW) / 2
 	millenniumY = (screenHeight - millenniumH) / 2
+
+	bgImg, _, err = ebitenutil.NewImageFromFile("res/background.png", ebiten.FilterDefault)
+	if err != nil {
+		log.Fatalf("could not load background image: %v", err)
+	}
 }
 
 func update(screen *ebiten.Image) error {
@@ -38,6 +45,10 @@ func update(screen *ebiten.Image) error {
 	}
 
 	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(screenWidth/float64(bgImg.Bounds().Dx()), screenHeight/float64(bgImg.Bounds().Dy()))
+	screen.DrawImage(bgImg, op)
+
+	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(millenniumX, millenniumY)
 	screen.DrawImage(millenniumImg, op)
 
