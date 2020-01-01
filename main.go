@@ -31,7 +31,9 @@ var asteroidY float64
 var asteroidW float64
 var asteroidH float64
 var asteroidScale float64 = .5
-var asteroidSpeed float64 = 10
+var asteroidSpeed float64 = 6
+
+var score int64
 
 func init() {
 	var err error
@@ -59,6 +61,13 @@ func init() {
 	asteroidH = float64(asteroidImg.Bounds().Dy()) * asteroidScale
 	asteroidX = float64(rand.Int63n(screenWidth - int64(asteroidW)))
 	asteroidY = -1 * asteroidH
+}
+
+func main() {
+	title := "This my game and it's called Asteroid Field!"
+	if err := ebiten.Run(update, screenWidth, screenHeight, 1, title); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func update(screen *ebiten.Image) error {
@@ -95,8 +104,14 @@ func update(screen *ebiten.Image) error {
 	if asteroidY > screenHeight {
 		asteroidX = float64(rand.Int63n(screenWidth - int64(asteroidW)))
 		asteroidY = -1 * asteroidH
+		score += 100
 	} else {
 		asteroidY += asteroidSpeed
+	}
+
+	gameOver := gameOver()
+	if gameOver {
+		return fmt.Errorf("Game Over! Your score is %d", score)
 	}
 
 	// Draw scene
@@ -114,15 +129,20 @@ func update(screen *ebiten.Image) error {
 	screen.DrawImage(asteroidImg, op)
 
 	// Debug infos
-	debugMsg := fmt.Sprintf("Millennium X: %d, Y: %d", int64(millenniumX), int64(millenniumY))
+	debugMsg := fmt.Sprintf("Your score is: %d", score)
 	ebitenutil.DebugPrint(screen, debugMsg)
 
 	return nil
 }
 
-func main() {
-	title := "This my game and it's called Asteroid Field!"
-	if err := ebiten.Run(update, screenWidth, screenHeight, 1, title); err != nil {
-		log.Fatal(err)
-	}
+func gameOver() bool {
+	millenniumX2 := millenniumX + millenniumW
+	millenniumY2 := millenniumY + millenniumH
+	asteroidX2 := asteroidX + asteroidW
+	asteroidY2 := asteroidY + asteroidH
+	overX1 := millenniumX >= asteroidX && millenniumX <= asteroidX2
+	overX2 := millenniumX2 >= asteroidX && millenniumX2 <= asteroidX2
+	overY1 := millenniumY >= asteroidY && millenniumY <= asteroidY2
+	overY2 := millenniumY2 >= asteroidY && millenniumY2 <= asteroidY2
+	return (overX1 || overX2) && (overY1 || overY2)
 }
