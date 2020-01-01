@@ -30,6 +30,7 @@ var asteroidX float64
 var asteroidY float64
 var asteroidW float64
 var asteroidH float64
+var asteroidScale float64 = .5
 var asteroidSpeed float64 = 10
 
 func init() {
@@ -54,8 +55,8 @@ func init() {
 	if err != nil {
 		log.Fatalf("could not load asteroid image: %v", err)
 	}
-	asteroidW = float64(asteroidImg.Bounds().Dx())
-	asteroidH = float64(asteroidImg.Bounds().Dy())
+	asteroidW = float64(asteroidImg.Bounds().Dx()) * asteroidScale
+	asteroidH = float64(asteroidImg.Bounds().Dy()) * asteroidScale
 	asteroidX = float64(rand.Int63n(screenWidth - int64(asteroidW)))
 	asteroidY = -1 * asteroidH
 }
@@ -108,6 +109,7 @@ func update(screen *ebiten.Image) error {
 	screen.DrawImage(millenniumImg, op)
 
 	op = &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(asteroidScale, asteroidScale)
 	op.GeoM.Translate(asteroidX, asteroidY)
 	screen.DrawImage(asteroidImg, op)
 
