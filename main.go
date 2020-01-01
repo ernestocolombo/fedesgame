@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
+
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -22,8 +25,22 @@ var millenniumW float64
 var millenniumH float64
 var millenniumSpeed float64 = 6
 
+var asteroidImg *ebiten.Image
+var asteroidX float64
+var asteroidY float64
+var asteroidW float64
+var asteroidH float64
+var asteroidSpeed float64 = 10
+
 func init() {
 	var err error
+	rand.Seed(time.Now().UnixNano())
+
+	bgImg, _, err = ebitenutil.NewImageFromFile("res/background.png", ebiten.FilterDefault)
+	if err != nil {
+		log.Fatalf("could not load background image: %v", err)
+	}
+
 	millenniumImg, _, err = ebitenutil.NewImageFromFile("res/millennium.png", ebiten.FilterDefault)
 	if err != nil {
 		log.Fatalf("could not load millennium image: %v", err)
@@ -33,10 +50,14 @@ func init() {
 	millenniumX = (screenWidth - millenniumW) / 2
 	millenniumY = (screenHeight - millenniumH) / 2
 
-	bgImg, _, err = ebitenutil.NewImageFromFile("res/background.png", ebiten.FilterDefault)
+	asteroidImg, _, err = ebitenutil.NewImageFromFile("res/asteroid.png", ebiten.FilterDefault)
 	if err != nil {
-		log.Fatalf("could not load background image: %v", err)
+		log.Fatalf("could not load asteroid image: %v", err)
 	}
+	asteroidW = float64(asteroidImg.Bounds().Dx())
+	asteroidH = float64(asteroidImg.Bounds().Dy())
+	asteroidX = float64(rand.Int63n(screenWidth - int64(asteroidW)))
+	asteroidY = -1 * asteroidH
 }
 
 func update(screen *ebiten.Image) error {
@@ -70,6 +91,13 @@ func update(screen *ebiten.Image) error {
 		}
 	}
 
+	if asteroidY > screenHeight {
+		asteroidX = float64(rand.Int63n(screenWidth - int64(asteroidW)))
+		asteroidY = -1 * asteroidH
+	} else {
+		asteroidY += asteroidSpeed
+	}
+
 	// Draw scene
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(screenWidth/float64(bgImg.Bounds().Dx()), screenHeight/float64(bgImg.Bounds().Dy()))
@@ -78,6 +106,10 @@ func update(screen *ebiten.Image) error {
 	op = &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(millenniumX, millenniumY)
 	screen.DrawImage(millenniumImg, op)
+
+	op = &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(asteroidX, asteroidY)
+	screen.DrawImage(asteroidImg, op)
 
 	// Debug infos
 	debugMsg := fmt.Sprintf("Millennium X: %d, Y: %d", int64(millenniumX), int64(millenniumY))
