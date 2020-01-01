@@ -31,9 +31,12 @@ var asteroidY float64
 var asteroidW float64
 var asteroidH float64
 var asteroidScale float64 = .5
-var asteroidSpeed float64 = 6
+var asteroidInitialSpeed float64 = 6
+var asteroidSpeed float64 = asteroidInitialSpeed
 
 var score int64
+var level int64 = 1
+var levelFlyBys int64
 
 func init() {
 	var err error
@@ -104,7 +107,13 @@ func update(screen *ebiten.Image) error {
 	if asteroidY > screenHeight {
 		asteroidX = float64(rand.Int63n(screenWidth - int64(asteroidW)))
 		asteroidY = -1 * asteroidH
-		score += 100
+		levelFlyBys++
+		score += level * 10
+		if levelFlyBys >= 10 {
+			level++
+			asteroidSpeed = float64(level+1) * .5 * asteroidInitialSpeed
+			levelFlyBys = 0
+		}
 	} else {
 		asteroidY += asteroidSpeed
 	}
@@ -129,7 +138,7 @@ func update(screen *ebiten.Image) error {
 	screen.DrawImage(asteroidImg, op)
 
 	// Debug infos
-	debugMsg := fmt.Sprintf("Your score is: %d", score)
+	debugMsg := fmt.Sprintf("Your score is %d at level %d", score, level)
 	ebitenutil.DebugPrint(screen, debugMsg)
 
 	return nil
