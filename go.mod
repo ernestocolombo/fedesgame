@@ -1,4 +1,4 @@
-module github.com:ernestocolombo/fedesgame
+module github.com/ernestocolombo/fedesgame
 
 go 1.12
 
